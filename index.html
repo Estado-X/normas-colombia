@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Normas de Colombia, citadas · Estado X</title>
+<meta name="description" content="Escribe tu pregunta en lenguaje sencillo y encuentra el artículo exacto de la Constitución, el derecho de petición, el Código del Trabajo, el Código de Policía o el Estatuto del Consumidor.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/estilos.css">
+</head>
+<body>
+<header class="banda">
+  <div class="contenedor banda__in">
+    <p class="kicker">Estado X · Herramienta abierta</p>
+    <h1>Pregunta. Te mostramos <em>el artículo.</em></h1>
+    <p class="banda__sub">Escribe tu duda en lenguaje sencillo y encuentra el artículo exacto de la norma colombiana que la responde, citado y con enlace a la fuente oficial.</p>
+    <form id="form" class="buscador" role="search">
+      <label for="q" class="sr">Tu pregunta</label>
+      <input id="q" type="search" placeholder="Ej.: ¿cuánto tiempo tienen para responder un derecho de petición?" autocomplete="off" disabled>
+      <button id="buscar" type="submit" disabled>Buscar</button>
+    </form>
+    <div class="ejemplos" aria-label="Preguntas de ejemplo">
+      <button type="button" data-ejemplo="¿Cuánto tiempo tienen para responder un derecho de petición?">Plazo del derecho de petición</button>
+      <button type="button" data-ejemplo="¿Me pueden despedir estando embarazada?">Despido y embarazo</button>
+      <button type="button" data-ejemplo="¿Puedo devolver algo que compré por internet?">Devolver una compra por internet</button>
+      <button type="button" data-ejemplo="¿Qué pasa si mi vecino hace mucho ruido en la noche?">Ruido de los vecinos</button>
+      <button type="button" data-ejemplo="¿Qué es la acción de tutela?">Acción de tutela</button>
+      <button type="button" data-ejemplo="artículo 64 código del trabajo">Artículo 64 del Código del Trabajo</button>
+    </div>
+  </div>
+</header>
+
+<main class="contenedor">
+  <div class="barra">
+    <p id="cifras" class="cifras">Cargando las normas…</p>
+    <fieldset id="filtros" class="filtros"><legend class="sr">Normas en las que se busca</legend></fieldset>
+  </div>
+
+  <p id="estado" class="estado" aria-live="polite"></p>
+  <div id="resultados" class="resultados"></div>
+
+  <section id="ia" class="ia" hidden aria-labelledby="ia-tit">
+    <div class="ia__cab">
+      <h2 id="ia-tit">Llévalo a tu IA</h2>
+      <p>Este texto le pide a la IA que responda <b>solo con estos artículos</b> y que cite cada afirmación. Cópialo y pégalo en Claude o en ChatGPT.</p>
+    </div>
+    <textarea id="ia-texto" rows="10" readonly aria-label="Texto para pegar en tu IA"></textarea>
+    <div class="ia__acciones">
+      <button id="copiar-ia" type="button" class="boton boton--principal">Copiar el texto</button>
+      <a class="boton" href="https://claude.ai/new" target="_blank" rel="noopener">Abrir Claude</a>
+      <a class="boton" href="https://chatgpt.com/" target="_blank" rel="noopener">Abrir ChatGPT</a>
+    </div>
+  </section>
+
+  <section class="bloque" aria-labelledby="sobre">
+    <h2 id="sobre">Qué normas trae y de dónde salen</h2>
+    <ul class="lista">
+      <li><b>Constitución Política de 1991</b>, con sus reformas y artículos transitorios.</li>
+      <li><b>Derecho de petición</b>: artículos 13 a 33 del Código de Procedimiento Administrativo, como los dejó la Ley 1755 de 2015.</li>
+      <li><b>Código Sustantivo del Trabajo</b>.</li>
+      <li><b>Código Nacional de Seguridad y Convivencia Ciudadana</b> (Código de Policía, Ley 1801 de 2016).</li>
+      <li><b>Estatuto del Consumidor</b> (Ley 1480 de 2011).</li>
+    </ul>
+    <p>El texto viene de la <a href="http://www.secretariasenado.gov.co/senado/basedoc/">Base Documental de la Secretaría General del Senado</a>. La Ley 23 de 1982, artículo 41, permite reproducir la Constitución, las leyes y los decretos, ajustándose a la edición oficial.</p>
+  </section>
+
+  <section class="bloque" aria-labelledby="limites">
+    <h2 id="limites">Antes de usarlo</h2>
+    <ul class="lista">
+      <li><b>No es asesoría legal.</b> La página busca artículos por palabras; no interpreta tu caso. Para decidir, consulta a un abogado, a un consultorio jurídico o a la Defensoría del Pueblo.</li>
+      <li>No trae jurisprudencia ni decretos reglamentarios, que pueden cambiar cómo se aplica un artículo.</li>
+      <li>Si la IA responde algo que no está en los artículos citados, desconfía de esa parte.</li>
+      <li>Revisa siempre el artículo en la fuente oficial antes de usarlo en un trámite.</li>
+    </ul>
+  </section>
+
+  <section class="bloque" aria-labelledby="credito">
+    <h2 id="credito">Crédito</h2>
+    <p>Inspirado en <a href="https://github.com/lawglance/lawglance">LawGlance</a> (licencia Apache-2.0): la idea de un asistente que responde con la norma citada. Esta es una versión nueva, escrita desde cero y pensada para Colombia, que funciona sin servidor ni claves. No reutiliza código de LawGlance.</p>
+    <p>Código: <a href="https://github.com/Estado-X/normas-colombia">github.com/Estado-X/normas-colombia</a>, licencia MIT.</p>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="contenedor">Hecho por <a href="https://estadox.com"><em>Estado X</em></a> · Modernización del Estado con IA</div>
+</footer>
+<script src="assets/sinonimos.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

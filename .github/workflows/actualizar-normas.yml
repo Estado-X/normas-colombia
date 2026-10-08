@@ -1,0 +1,40 @@
+name: Actualizar normas
+
+# LANZAMIENTO: para prender la actualización mensual, quitar "# " al inicio de las dos líneas de schedule.
+on:
+  # schedule:
+  #   - cron: "0 11 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: actualizar-normas
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bajar las normas de la Secretaría del Senado
+        run: python scripts/armar_corpus.py
+
+      - name: Guardar si cambió
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/normas.json
+          if git diff --cached --quiet; then
+            echo "Sin cambios en el texto de las normas."
+          else
+            git commit -m "Normas actualizadas desde la Secretaría del Senado"
+            git push
+          fi
