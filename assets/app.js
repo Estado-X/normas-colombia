@@ -5,7 +5,7 @@
 
   var NORMAS = [], ARTS = [], IDX = null, ACTUAL = [];
   var $ = function (id) { return document.getElementById(id); };
-  var VACIAS = new Set(("a al algo algun alguna algunas alguno algunos ante antes aqui asi aun cada como con contra cual cuales cuando de del desde donde dos el ella ellas ello ellos en entre era es esa esas ese eso esos esta estan estas este esto estos fue ha hay hacer hace la las le les lo los mas me mi mis muy ni no nos o otra otro para pero poco por porque puede pueden puedo que quien se sea ser si sin sobre su sus tambien tan tanto te tengo tiene tienen todo todos tu un una uno unos usted y ya yo articulo articulos ley codigo constitucion norma derecho").split(" "));
+  var VACIAS = new Set(("a al algo algun alguna algunas alguno algunos ante antes aqui asi aun cada como con contra cual cuales cuando de del desde donde dos el ella ellas ello ellos en entre era es esa esas ese eso esos esta estan estas este esto estos fue ha hay hacer hace la las le les lo los mas me mi mis muy ni no nos o otra otro para pero poco por porque puede pueden puedo que quien se sea ser si sin sobre su sus tambien tan tanto te tengo tiene tienen todo todos tu un una uno unos usted y ya yo articulo articulos").split(" "));
 
   function normalizar(t) {
     return (t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9ñ\s-]/g, " ").replace(/ñ/g, "n");
@@ -64,16 +64,19 @@
     return res;
   }
 
-  /* Referencias directas: «art 86», «artículo 23 de la constitución», «64 del código del trabajo» */
-  var ALIAS = [["constitucion", /constituc/], ["peticion", /1755|peticion/], ["trabajo", /trabajo|laboral|cst\b/], ["policia", /policia|1801|convivencia/], ["consumidor", /consumidor|1480/]];
+  /* Referencias directas: «art 86», «artículo 23 de la constitución», «art 167A código del trabajo»,
+     «artículo transitorio 66», «64 del código del trabajo» */
+  var ALIAS = [["constitucion", /constituc/], ["peticion", /1755|1437|cpaca|peticion/], ["trabajo", /trabajo|laboral|cst\b/], ["policia", /policia|1801|convivencia/], ["consumidor", /consumidor|1480/]];
+  function clave(n) { return String(n).split(" al")[0].replace(/[\s-]/g, ""); }
   function referenciaDirecta(q) {
     var n = normalizar(q);
-    var m = n.match(/\b(?:art(?:iculo)?s?\.?\s*)(\d+(?:-?[a-z])?)\b/);
+    var m = n.match(/\bart(?:iculo)?s?\.?\s*(transitorio\s*)?(\d+(?:\s?-?\s?[a-z](?![a-z]))?)\b/) ||
+            n.match(/\b()(\d+(?:-?[a-z])?)\s+(?:del?|de la)\s+(?:constitucion|codigo|ley|estatuto)/);
     if (!m) return null;
-    var num = m[1].replace(/^(\d+)([a-z])$/, "$1-$2");
+    var buscado = (m[1] ? "transitorio" : "") + m[2].replace(/[\s-]/g, "");
     var norma = null;
     ALIAS.forEach(function (a) { if (a[1].test(n)) norma = norma || a[0]; });
-    return ARTS.filter(function (a) { return a.numero.replace(/\s/g, "") === num && (!norma || a.norma === norma); });
+    return ARTS.filter(function (a) { return clave(a.numero.toLowerCase()) === buscado && (!norma || a.norma === norma); });
   }
 
   function buscar(q) {
@@ -86,7 +89,7 @@
       var p = puntaje(consulta, pesos);
       for (var i = 0; i < ARTS.length; i++) {
         if (!p[i] || !filtro.has(ARTS[i].norma)) continue;
-        res.push({ a: ARTS[i], s: p[i] * (ARTS[i].derogado ? 0.15 : 1) * (ARTS[i].numero.indexOf("transitorio") === 0 ? 0.5 : 1) });
+        res.push({ a: ARTS[i], s: p[i] * (ARTS[i].estado !== "vigente" ? 0.15 : 1) * (ARTS[i].numero.indexOf("transitorio") === 0 ? 0.5 : 1) });
       }
       res.sort(function (x, y) { return y.s - x.s; });
     }
@@ -109,14 +112,14 @@
   }
 
   function tarjeta(a, raices, i) {
-    var art = el("article", "articulo" + (a.derogado ? " articulo--derogado" : ""));
+    var art = el("article", "articulo" + (a.estado !== "vigente" ? " articulo--derogado" : ""));
     var cab = el("header", "articulo__cab");
     cab.appendChild(el("span", "articulo__num", String(i + 1)));
     var t = el("div", "articulo__tit");
     t.appendChild(el("h3", null, cap(a.cita) + (a.titulo ? " · " + a.titulo : "")));
     if (a.ubicacion) t.appendChild(el("p", "articulo__ubic", a.ubicacion));
     cab.appendChild(t);
-    if (a.derogado) cab.appendChild(el("span", "pildora pildora--gris", "Derogado"));
+    if (a.estado !== "vigente") cab.appendChild(el("span", "pildora pildora--gris", ESTADOS[a.estado] || a.estado));
     art.appendChild(cab);
     var cuerpo = el("div", "articulo__texto");
     var parrafos = a.texto.length ? a.texto : ["(Sin texto vigente.)"];
@@ -132,10 +135,8 @@
       mas.addEventListener("click", function () { cuerpo.querySelectorAll(".oculto").forEach(function (x) { x.classList.remove("oculto"); }); mas.remove(); });
       art.appendChild(mas);
     }
-    if (a.notas.length) {
-      var nota = el("p", "articulo__nota");
-      nota.textContent = "Nota de la Secretaría del Senado: " + a.notas.slice(0, 3).join(" · ") + (a.notas.length > 3 ? " …" : "");
-      art.appendChild(nota);
+    if (a.marcas && a.marcas.length) {
+      art.appendChild(el("p", "articulo__nota", "Estado según la Base Documental del Senado: " + a.marcas.join(" · ") + "."));
     }
     var pie = el("footer", "articulo__pie");
     var fuente = el("a", null, "Ver en la fuente oficial");
@@ -149,6 +150,8 @@
     return art;
   }
 
+  var ESTADOS = { derogado: "Derogado", inexequible: "Inexequible" };
+  var ESTADOS_IA = { derogado: "DEROGADO: ya no está vigente", inexequible: "DECLARADO INEXEQUIBLE por la Corte Constitucional: ya no está vigente" };
   function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
   function textoParaIA(q, lista) {
@@ -157,6 +160,7 @@
       "Responde mi pregunta usando SOLO los artículos que van abajo.",
       "- Cita cada afirmación con el artículo entre corchetes, por ejemplo [" + (lista[0] ? lista[0].cita : "art. 23 de la Constitución Política") + "].",
       "- Si los artículos no alcanzan para responder, dilo con claridad y no completes con otras fuentes ni con tu memoria.",
+      "- No uses como vigente un artículo marcado como derogado o inexequible; si es el único que habla del tema, dilo.",
       "- Responde en español sencillo, en máximo 8 líneas, y termina recordando que esto no es asesoría legal.",
       "",
       "Mi pregunta: " + q,
@@ -165,7 +169,8 @@
     ];
     lista.forEach(function (a, i) {
       l.push("");
-      l.push("[" + (i + 1) + "] " + cap(a.cita) + (a.titulo ? " — " + a.titulo : "") + (a.derogado ? " (DEROGADO)" : ""));
+      l.push("[" + (i + 1) + "] " + cap(a.cita) + (a.titulo ? " — " + a.titulo : "") + (a.estado !== "vigente" ? " (" + ESTADOS_IA[a.estado] + ")" : ""));
+      if (a.marcas && a.marcas.length) l.push("Estado: " + a.marcas.join("; ") + ".");
       l.push(a.texto.join("\n"));
       l.push("Fuente: " + a.url);
     });
