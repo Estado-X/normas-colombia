@@ -25,7 +25,8 @@ code { font: 14px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; 
 .banda__in { padding-block: 56px 48px; display: grid; gap: 16px; }
 .kicker { margin: 0; font: 600 12px/1.2 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--cadmio); }
 h1 { margin: 0; font: 700 clamp(38px, 6.4vw, 68px)/1.02 var(--display); letter-spacing: -.02em; text-wrap: balance; max-width: 16ch; }
-h1 em, .pie em { font-family: var(--acento); font-style: italic; font-weight: 400; }
+h1 em, .pie em { font-style: normal; }
+.pie em { font-weight: 600; }
 h1 em { color: var(--cadmio); }
 .banda__sub { margin: 0; max-width: 58ch; font-size: 19px; color: rgba(242,235,220,.9); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
