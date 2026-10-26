@@ -1,9 +1,9 @@
 name: Actualizar normas
 
-# LANZAMIENTO: para prender la actualización mensual, quitar "# " al inicio de las dos líneas de schedule.
+# Actualización mensual: día 1 de cada mes, 6:00 a. m. (Bogotá). También se puede correr a mano.
 on:
-  # schedule:
-  #   - cron: "0 11 1 * *"
+  schedule:
+    - cron: "0 11 1 * *"
   workflow_dispatch:
 
 permissions:
